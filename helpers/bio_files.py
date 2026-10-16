@@ -40,17 +40,23 @@ def extract_top_blast_hits(file_path: str) -> list[str]:
 
             if in_significant_block:
                 stripped_line = line.strip()
-                if not stripped_line or stripped_line.startswith(
-                    ("Scientific Name", "Description")
+
+                if not stripped_line:
+                    continue
+
+                if stripped_line.startswith(
+                    ("Description", "Scientific", "Max", "Total", "-----")
                 ):
                     continue
 
-                if len(line) >= 60:
+                if len(line) >= 60 and not line.startswith(" "):
                     description = line[:60].strip()
                 else:
                     description = stripped_line.split("  ")[0].strip()
 
-                best_hits.append(description)
+                if description:
+                    best_hits.append(description)
+
                 in_significant_block = False
 
     return best_hits
