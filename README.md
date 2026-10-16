@@ -11,6 +11,7 @@ Clone the repository and import modules directly:
 ```bash
 git clone https://github.com/nastyaprok/2026_27_IB_BioTools
 cd hw4-utils
+```
 
 ## Running instructions
 
