@@ -1,6 +1,4 @@
-"""Helper functions for FASTQ processing and filtering."""
-
-import os
+"""FASTQ helper functions for reading, checking, and saving records."""
 
 
 def normalize_bounds(bounds: float | tuple | list) -> tuple[float, float]:
@@ -42,43 +40,3 @@ def save_read(
     file_handle.write(sequence + "\n")
     file_handle.write(comment + "\n")
     file_handle.write(quality + "\n")
-
-
-def filter_fastq(
-    input_fastq: str,
-    output_fastq: str,
-    gc_bounds: float | tuple | list = (0, 100),
-    length_bounds: float | tuple | list = (0, 2**32),
-    quality_threshold: float = 0,
-) -> None:
-    """Filter FASTQ reads on the fly by length, GC%, and Phred33 quality."""
-    gc_limits = normalize_bounds(gc_bounds)
-    length_limits = normalize_bounds(length_bounds)
-    min_quality = float(quality_threshold)
-
-    output_dir = "filtered"
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, output_fastq)
-
-    with (
-        open(input_fastq, "r", encoding="utf-8") as in_f,
-        open(output_path, "w", encoding="utf-8") as out_f,
-    ):
-        while True:
-            header = in_f.readline()
-            if not header:
-                break
-
-            sequence = in_f.readline().strip()
-            comment = in_f.readline().strip()
-            quality = in_f.readline().strip()
-            header = header.strip()
-
-            if not is_length_ok(sequence, length_limits):
-                continue
-            if not is_gc_ok(sequence, gc_limits):
-                continue
-            if not is_quality_ok(quality, min_quality):
-                continue
-
-            save_read(out_f, header, sequence, comment, quality)
